@@ -167,6 +167,11 @@
     <button class="btn-sm" id="resetReadme" style="margin-top:0">Restore original text</button>
   </div>
 
+  <div class="box" data-edit="r0">
+    <h2 style="font-size:1.5rem">PostHog SuperDay prep</h2>
+    <p class="small" style="margin-top:10px"><a href="https://github.com/isathepigeon/posthog-superday" style="color:var(--accent)"><b>Source on GitHub &rarr;</b></a></p>
+  </div>
+
   <div class="box" data-edit="r1" style="box-shadow:5px 5px 0 var(--accent)">
     <h2>Hi, I'm Isa :) This is everything I did to prepare for the SuperDay.</h2>
     <p class="small" style="margin-top:10px">I heard it's not easy to get an offer and I haven't programmed in JS in a while, so wanted to make sure I came prepared.</p>
@@ -203,13 +208,16 @@
     <p class="small" style="margin-top:12px"><b>The SLA clock measures the first reply, not the fix.</b> But from experience, you have to be careful to not only keep the metric by always giving people "empty" acknowledgements while never dirtying your hands to fix their issue.</p>
     <p class="small" style="margin-top:12px"><b>"We didn't change anything" is scope, not a lie.</b> The person writing didn't change anything. Someone on their team might have.</p>
   </div>
+  <div class="box" data-edit="r6">
+    <h2>Stack</h2>
+    <p class="small">Vanilla HTML, CSS and JavaScript, no build step. State lives in <code>localStorage</code>.</p>
+  </div>
 </div>
 
 <!-- ============ PREP ============ -->
 <div class="view" id="vPrep">
   <div class="box">
     <h2>Before the day starts</h2>
-    <p class="hint">Three bugs to plant in your own project, one per ticket. Do this on the machine with VS Code, in <code>isathepigeon-site/public</code>.</p>
     <div class="tip" style="border-color:var(--warn);background:var(--btnWarnBox)">
       <b>Commit the clean state, once, before you break anything.</b> In the terminal, inside the project: <code>git status</code>. If <code>lab.html</code> and <code>lab.js</code> aren't committed yet, commit them now, while they still work.<br><br>
       After that, <b>never commit the broken state</b>. The commit is your clean baseline, the uncommitted change is the planted bug. That split is what makes <code>git diff</code> show exactly what you broke and <code>git checkout lab/lab.html</code> undo it in one command.<br><br>
@@ -321,7 +329,6 @@ Happy to jump on a call if that is faster.</div>
 
   <div class="box">
     <h2>Reply to Dana</h2>
-    <p class="hint">An acknowledgement. She already got an automatic confirmation when the ticket was created, so this has to add something: what you're doing and when you'll be back.</p>
     <textarea id="replyDana" placeholder="Hey Dana,">Hey Dana,
 We&#x27;re truly sorry you trusted our services on data recording and experienced this possible lost. 
 We are currently looking into whether it&#x27;s a Posthog wider issue or if I can find error logs between configuration and our servers.
@@ -341,7 +348,6 @@ First thing I'm checking is whether this is specific to your project or somethin
 
   <div class="box">
     <h2>Reply to Priya</h2>
-    <p class="hint">She has a deadline. Your reply has to say whether you'll make it, and what she does if you don't.</p>
     <textarea id="replyPriya" placeholder="Hey Priya,">Hey Priya,
 Thank you for flagging the mismatch on the user records you&#x27;re receiving from us and we&#x27;re sorry for the inconvenience.
 I will start investigating soon and will get back to you at 13:00 with what I have found and what you can explain in the meeting.
@@ -360,12 +366,11 @@ No need for a call yet. If I hit something that's faster to explain live, I'll p
   </div>
 
   <div class="box">
-    <h2>How PostHog actually writes</h2>
-    <p class="hint">Their real text during a session replay ingestion failure, published on the status page.</p>
+    <h2>PostHog tone of voice</h2>
     <div class="model">We've spotted that session recordings are not visible in eu.posthog.com. No recording data has been lost!
 
-We believe we've identified the root cause and are working to resolve it. Thanks for your patience<div class="why">Four lines, three moves: what broke, the scariest question answered up front, and what happens next. No jargon, no promise of a deadline they can't keep.</div></div>
-    <p style="font-size:13.5px;margin-top:14px">Tone rules from the handbook: open with "Hey [name]". Acknowledge frustration and thank them for the report. Make clear who is waiting on whom, and for how long. Don't make the customer do work you can do yourself, and explain why you need anything you ask for.</p>
+We believe we've identified the root cause and are working to resolve it. Thanks for your patience</div>
+    <p class="small" style="margin-top:12px"><a href="https://posthog.com/handbook/engineering/support-hero" style="color:var(--accent)">posthog.com/handbook/engineering/support-hero</a></p>
   </div>
 </div>
 
@@ -391,21 +396,18 @@ We believe we've identified the root cause and are working to resolve it. Thanks
 
   <div class="box" style="box-shadow:5px 5px 0 var(--ent)">
     <h2>Reproduce and rule out — Dana #4498</h2>
-    <p class="hint">Cheapest to most expensive. Each one answers a different question. Click to tick.</p>
     <div id="checksDana"></div>
     <div class="tip" id="tipDana"></div>
   </div>
 
   <div class="box" style="box-shadow:5px 5px 0 var(--warn)">
     <h2>Reproduce and rule out — Priya, Slack</h2>
-    <p class="hint">Cheapest to most expensive. Each one answers a different question. Click to tick.</p>
     <div id="checksPriya"></div>
     <div class="tip" id="tipPriya"></div>
   </div>
 
   <div class="box">
     <h2>What I found</h2>
-    <p class="hint">Write as you go. This becomes the customer reply and the handover note, so write it for whoever reads it next.</p>
     <textarea id="findings" placeholder="Hypothesis:&#10;What I tested:&#10;What that rules out:&#10;Next step:">Dana:
 Hypothesis:
 No /s/ on Network tab
@@ -426,7 +428,6 @@ Next step: ask her if by any chance someone renamed the event.</textarea>
 <div class="view" id="vHand">
   <div class="box">
     <h2>Final reply to Dana</h2>
-    <p class="hint">The answer she actually gets once you know the cause. Four things belong in it: what was wrong, in her words not yours; whether her lost recordings come back or not; what she has to do, if anything; and what you did on your side.</p>
     <textarea id="finalDana" placeholder="Hey Dana,">Hey Dana,
 
 Unfortunately, I have to confirm what you suspected: those three days of recordings are gone. As they were never captured, there&#x27;s no data on our side waiting to appear.
@@ -445,7 +446,6 @@ Let me know if you need help to remove the disabling of session recording from y
 
   <div class="box">
     <h2>Final reply to Priya</h2>
-    <p class="hint">Same four things. Plus the one she asked for: is the drop real or not, said plainly enough that she can repeat it in a board meeting without you.</p>
     <textarea id="finalPriya" placeholder="Hey Priya,">Hey Priya,
 Thanks for waiting!
 
@@ -462,7 +462,6 @@ Looking forward to hearing from you and let me know if there are any questions :
 
   <div class="box">
     <h2>Private handover note</h2>
-    <p class="hint">Different from escalating. This is for unfinished work going to the next Support Hero at the end of your shift, not to another team. The rule is the same: say why you're handing it over and what you expect to happen next.</p>
     <textarea id="handoff" class="short" placeholder="Handing over to the next Support Hero.">Handing over to the next Support Hero.
 
 Priya N., Velocity Labs. Enterprise, top_20.  Weekly active users dropped 30% between Friday and Monday.
