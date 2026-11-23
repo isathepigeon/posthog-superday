@@ -41,17 +41,15 @@ I triaged them against the handbook's actual rules: response targets by plan, th
 
 Both root causes found. The write-ups are in the runbook.
 
-## What I learned that I did not expect
-
-**A deadline is not a priority.** It tells you when to start, not what to do first. Estimate the work, double it, subtract from the deadline. Before that time, the hours belong to whatever is actively losing data.
-
-**The SLA clock measures the first reply, not the fix.** Twenty minutes of short acknowledgements at the start of the day buys the whole day.
-
-**Configuration is not state.** The server saying "recording is enabled" and the SDK config holding recording options both tell you nothing about whether anything is being recorded. Three things answer that, and none of them is a settings page: `posthog.sessionRecordingStarted()`, the absence of `$snapshot` in the console, and the absence of `/s/` in the network tab.
-
-**"We didn't change anything" is scope, not a lie.** The person writing didn't change anything. Someone else on their team might have.
+## What I got out of this
 
 **Tags don't always mean priority.** Both my tickets were Enterprise, so `churn_risk` and `top_20` couldn't break the tie. What they decide is handling: who else needs looping in.
+
+**Most of what I learned came from being wrong first.** I had the two tickets filed as "one is losing data, the other just has a deadline" until I noticed that at triage time the data loss is the customer's claim, not a verified fact, and that if the second customer's tracking is still broken she is losing records by the hour too. The two tickets were far closer than my first pass made them look.
+
+**Which led to the thing I actually use now:** before ranking anything, spend fifteen minutes finding out what you are ranking. A cheap check changes the size of the problem.
+
+**I also stopped taking "we didn't change anything" as evidence**, including in my own notes. It is scope, not a lie: the person writing didn't change anything.
 
 ---
 
