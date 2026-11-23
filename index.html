@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Runbook — Support Hero</title>
+<style>
+  :root{
+    color-scheme: light;
+    --ink:#17141f; --paper:#f7f4ef; --card:#ffffff; --shadow:rgba(23,20,31,.2);
+    --soft:#f0ece4; --field:#fcfbf9; --fieldBorder:#ddd8d0;
+    --accent:#6c4df6; --onAccent:#ffffff;
+    --ent:#e5484d; --good:#12a150; --warn:#f2890d; --cool:#3b82c4;
+    --headBg:#17141f; --headFg:#f7f4ef; --headTrack:#332e40;
+    --codeBg:#17141f; --codeFg:#b9f6c8; --vsBg:#231f2e;
+    --tipBg:#e7f3ff; --modelBg:#f4f1fb; --calcBg:#fffbea; --doneBg:#eafaf0;
+    --btnGo:#b9f6c8; --btnStop:#ffd9a0; --btnReset:#e8e4ef;
+    --btnCopy:#cfe3ff; --btnRead:#fff0c2; --btnWarnBox:#fff6e6;
+  }
+  html[data-theme="dark"]{
+    color-scheme: dark;
+    --ink:#ece8f5; --paper:#15131c; --card:#1e1b27; --shadow:rgba(0,0,0,.6);
+    --soft:#2a2537; --field:#262231; --fieldBorder:#3d3650;
+    --accent:#9d85ff; --onAccent:#15131c;
+    --ent:#ff6b70; --good:#3ddc84; --warn:#ffa94d; --cool:#7cc4ff;
+    --headBg:#221e2e; --headFg:#ece8f5; --headTrack:#15131c;
+    --codeBg:#0d0b12; --codeFg:#8ef0b0; --vsBg:#15131c;
+    --tipBg:#17293a; --modelBg:#262036; --calcBg:#2d2718; --doneBg:#14301e;
+    --btnGo:#1f6b3c; --btnStop:#7a4a12; --btnReset:#3a3448;
+    --btnCopy:#1d3d5c; --btnRead:#5c4a14; --btnWarnBox:#2d2718;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font:15px/1.55 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  .wrap{max-width:880px;margin:0 auto;padding:20px 16px 90px}
+
+  header{background:var(--headBg);color:var(--headFg);border:3px solid var(--headBg);
+    box-shadow:7px 7px 0 var(--accent);padding:16px 19px;margin-bottom:16px;position:relative}
+  header h1{margin:0 0 3px;font-size:20px}
+  header p{margin:0;font-size:13px;opacity:.8}
+  #theme{position:absolute;top:14px;right:16px;padding:6px 12px;font-size:12.5px;
+    background:var(--card);color:var(--ink);border-color:var(--ink);box-shadow:2px 2px 0 var(--accent)}
+  .progress{height:12px;background:var(--headTrack);border:2px solid var(--headFg);margin-top:12px}
+  .bar{height:100%;width:0;background:var(--good);transition:width .25s}
+  .pct{font-size:12px;margin-top:5px;opacity:.8}
+
+  button{font:inherit;font-weight:700;cursor:pointer;padding:8px 14px;
+    border:3px solid var(--ink);background:var(--card);color:var(--ink);
+    box-shadow:3px 3px 0 var(--ink);transition:transform .06s,box-shadow .06s}
+  button:active{transform:translate(3px,3px);box-shadow:none}
+
+  nav{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:20px}
+  nav button.on{background:var(--accent);color:var(--onAccent);border-color:var(--accent)}
+
+  .view{display:none}
+  .view.on{display:block}
+
+  .tickets{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:22px}
+  @media(max-width:700px){.tickets{grid-template-columns:1fr}}
+  .tk{background:var(--card);border:3px solid var(--ink);border-top-width:11px;padding:13px 15px;
+    box-shadow:4px 4px 0 var(--shadow)}
+  .tk.dana{border-top-color:var(--ent)}
+  .tk.priya{border-top-color:var(--warn)}
+  .tk h3{margin:0 0 5px;font-size:15px}
+  .meta{font-size:12px;opacity:.75;margin-bottom:7px}
+  .chip{display:inline-block;font-size:11px;font-weight:800;padding:2px 7px;
+    border:2px solid var(--ink);margin:0 4px 4px 0;text-transform:uppercase}
+  .chip.plan{background:var(--ent);color:#fff;border-color:var(--ent)}
+  .chip.tag{background:var(--calcBg)}
+  .tk p{margin:7px 0 0;font-size:13.5px}
+  .full{margin-top:10px;padding:11px 13px;background:var(--soft);border-left:5px solid var(--ink);
+    font-size:13px;white-space:pre-line}
+  .btn-sm{margin-top:10px;padding:6px 11px;font-size:13px;background:var(--btnRead);
+    box-shadow:2px 2px 0 var(--ink)}
+
+  .step{background:var(--card);border:3px solid var(--ink);box-shadow:4px 4px 0 var(--shadow);
+    padding:13px 15px;margin-bottom:12px;display:flex;gap:13px;align-items:flex-start}
+  .step.done{background:var(--doneBg);box-shadow:4px 4px 0 var(--good)}
+  .num{min-width:34px;height:34px;display:grid;place-items:center;flex:none;
+    font:800 16px/1 ui-monospace,monospace;border:3px solid var(--ink);background:var(--soft)}
+  .step.done .num{background:var(--good);color:#06230f}
+  .step-body{flex:1;min-width:0}
+  .step-body h4{margin:0 0 3px;font-size:15px}
+  .step-body p{margin:0;font-size:13.5px;opacity:.88}
+  .step-act{margin-top:9px}
+  .btn-check{background:var(--btnGo)}
+  .step.done .btn-check{background:var(--btnReset)}
+
+  .calc{background:var(--calcBg);border:3px dashed var(--ink);padding:12px 14px;margin-top:10px}
+  label{display:block;font-size:12.5px;font-weight:700;margin:8px 0 3px}
+  input,select{font:inherit;padding:7px 9px;border:3px solid var(--fieldBorder);
+    background:var(--field);color:var(--ink)}
+  input{width:110px}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent)}
+  .result{margin-top:12px;padding:11px 13px;background:var(--codeBg);color:var(--codeFg);
+    font:700 14px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-line}
+
+  .box{background:var(--card);border:3px solid var(--ink);box-shadow:5px 5px 0 var(--shadow);
+    padding:16px 18px;margin-bottom:18px}
+  .box h2{margin:0 0 4px;font-size:17px}
+  .box h3{margin:15px 0 5px;font-size:13.5px;text-transform:uppercase;letter-spacing:.5px;opacity:.7}
+  .box .hint{margin:0 0 10px;font-size:13px;opacity:.78}
+  .box .small{margin:0;font-size:13.5px}
+  .code{background:var(--codeBg);color:var(--codeFg);padding:13px 15px;margin:10px 0 0;
+    font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre;overflow-x:auto}
+  textarea{width:100%;min-height:190px;padding:12px;font:inherit;font-size:14px;
+    color:var(--ink);border:3px solid var(--fieldBorder);background:var(--field);
+    resize:vertical;line-height:1.5}
+  textarea.short{min-height:130px}
+  textarea::placeholder{color:var(--ink);opacity:.45}
+  .row{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:10px}
+  .count{font-size:12px;opacity:.65}
+  .hidden{display:none}
+  .model{background:var(--modelBg);border-left:5px solid var(--accent);padding:12px 14px;
+    margin-top:10px;font-size:13.5px;white-space:pre-line}
+  .why{font-size:12.5px;opacity:.8;margin:7px 0 0}
+
+  .timer{background:var(--headBg);color:var(--headFg);border:3px solid var(--headBg);
+    box-shadow:6px 6px 0 var(--warn);padding:20px;margin-bottom:18px;text-align:center}
+  .big{font:800 52px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:-1px}
+  .vs{margin-top:14px;padding:12px;background:var(--vsBg);font-size:13.5px;white-space:pre-line;
+    font-family:ui-monospace,monospace}
+  .timer .row{justify-content:center}
+  .timer label{color:var(--headFg)}
+
+  .chk{background:var(--card);border:3px solid var(--ink);box-shadow:4px 4px 0 var(--shadow);
+    padding:11px 14px;margin-bottom:10px;display:flex;gap:11px;align-items:flex-start;cursor:pointer}
+  .chk.done{background:var(--doneBg);box-shadow:4px 4px 0 var(--good)}
+  .mark{min-width:26px;height:26px;flex:none;border:3px solid var(--ink);background:var(--card);
+    display:grid;place-items:center;font-weight:800;font-size:15px}
+  .chk.done .mark{background:var(--good);color:#06230f}
+  .chk div strong{display:block;font-size:14px}
+  .chk div span{font-size:12.5px;opacity:.8}
+  .tip{background:var(--tipBg);border:3px solid var(--cool);padding:12px 14px;margin-top:14px;font-size:13.5px}
+  code{background:var(--soft);padding:1px 5px;font-size:13px}
+  [data-edit]{outline:2px dashed transparent;outline-offset:6px;transition:outline-color .15s}
+  [data-edit]:hover{outline-color:var(--fieldBorder)}
+  [data-edit]:focus{outline:2px dashed var(--accent);outline-offset:6px}
+  .editnote{background:var(--calcBg);border:3px dashed var(--ink);padding:11px 14px;
+    margin-bottom:18px;font-size:13.5px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <button id="theme">Dark mode</button>
+  <h1>Support Hero Runbook</h1>
+  <p>Two tickets. Prep, triage, writing, investigation.</p>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div class="pct" id="pct">0 of 8 steps</div>
+</header>
+
+<nav>
+  <button data-view="vReadme">README</button>
+  <button data-view="vPrep">Set up the lab</button>
+  <button class="on" data-view="vSteps">1 · Steps</button>
+  <button data-view="vWrite">2 · Write</button>
+  <button data-view="vDig">3 · Investigate</button>
+  <button data-view="vHand">4 · Hand over</button>
+</nav>
+
+<!-- ============ README ============ -->
+<div class="view" id="vReadme">
+  <div class="editnote">
+    <span>This page is yours to edit. Click any text and type. Changes save in this browser.</span>
+    <button class="btn-sm" id="resetReadme" style="margin-top:0">Restore original text</button>
+  </div>
+
+  <div class="box" data-edit="r1" style="box-shadow:5px 5px 0 var(--accent)">
+    <h2>Hi, I'm Isa. This is everything I did to prepare for the SuperDay.</h2>
+    <p class="small" style="margin-top:10px">None of this was asked for. I wanted to arrive already knowing what a support ticket feels like from the inside, so I built myself a day of them.</p>
+  </div>
+
+  <div class="box" data-edit="r2">
+    <h2>1. I got PostHog running myself</h2>
+    <p class="small">I forked the repo and cloned it locally. The build died on my laptop, which only has 8GB of RAM, so I moved it onto a Google Cloud VM I already had sitting around from another project. Ubuntu 24.04, 16GB.</p>
+    <p class="small" style="margin-top:10px">From there: <code>flox activate</code>, then <code>hogli start</code>. 31 processes, all the logs in one terminal UI.</p>
+    <img src="vm-local-dev.png" alt="PostHog dev stack running in phrocs on a Google Cloud VM" style="width:100%;margin-top:14px;border:3px solid var(--ink);display:block">
+    <p class="small" style="margin-top:12px">In the end I did the actual exercises against PostHog Cloud, which is what the team suggested in the SuperDay Slack channel. The local stack was not the shortest path to the thing I was trying to learn. But getting it up taught me the architecture, and that turned out to matter more than I expected: when I later had to reason about where a session recording can get lost, I already knew what sits between the browser and the dashboard.</p>
+  </div>
+
+  <div class="box" data-edit="r3">
+    <h2>2. I built a small site and broke it on purpose</h2>
+    <p class="small">I needed a customer, so I played one. I put a fake shop page on my own site's project and planted real bugs in it, one per ticket:</p>
+    <p class="small" style="margin-top:10px"><code>disable_session_recording: true</code> in the init, which stops session replay while leaving everything else working.</p>
+    <p class="small" style="margin-top:6px">A renamed event, which kills a saved chart while the app stays perfectly healthy.</p>
+    <p class="small" style="margin-top:10px">Then I investigated them as if I had no idea what was wrong. Committing the clean version first meant <code>git diff</code> showed exactly what I had broken, and <code>git checkout</code> undid it in one command.</p>
+  </div>
+
+  <div class="box" data-edit="r4">
+    <h2>3. I ran a day, not a ticket</h2>
+    <p class="small">Two tickets, deliberately more work than fits: an Enterprise customer tagged churn_risk losing session recordings mid usability study, and a top_20 Enterprise customer whose weekly active users dropped 30% with a board meeting at 16:00.</p>
+    <p class="small" style="margin-top:10px">I triaged them against the handbook's actual rules: response targets by plan, the tags that have to be resolved or handed over by end of rotation, paid before community. Then I wrote the acknowledgements, worked the investigation, and wrote the final replies and the handover.</p>
+  </div>
+
+  <div class="box" data-edit="r5">
+    <h2>What I learned that I did not expect</h2>
+    <p class="small"><b>A deadline is not a priority.</b> It tells you when to start, not what to do first. You estimate the work, double it, subtract from the deadline. Before that time, the hours belong to whatever is actively losing data.</p>
+    <p class="small" style="margin-top:10px"><b>The SLA clock measures the first reply, not the fix.</b> Twenty minutes of short acknowledgements at the start of the day buys the whole day.</p>
+    <p class="small" style="margin-top:10px"><b>Configuration is not state.</b> The server saying "recording is enabled" and the SDK config holding recording options both tell you nothing about whether anything is being recorded. Three things answer that, and none of them is a settings page.</p>
+    <p class="small" style="margin-top:10px"><b>"We didn't change anything" is scope, not a lie.</b> The person writing didn't change anything. Someone on their team might have.</p>
+  </div>
+
+  <div class="box" data-edit="r6" style="box-shadow:5px 5px 0 var(--warn)">
+    <h2>Where I got to</h2>
+    <p class="small">Honest status: I worked the session replay ticket end to end and found the root cause. The second ticket and the escalation note are unfinished.</p>
+    <p class="small" style="margin-top:10px">Which is itself the point of the exercise. The queue was built to be bigger than the day.</p>
+  </div>
+</div>
+
+<!-- ============ PREP ============ -->
+<div class="view" id="vPrep">
+  <div class="box">
+    <h2>Before the day starts</h2>
+    <p class="hint">Three bugs to plant in your own project, one per ticket. Do this on the machine with VS Code, in <code>isathepigeon-site/public</code>.</p>
+    <div class="tip" style="border-color:var(--warn);background:var(--btnWarnBox)">
+      <b>Commit the clean state, once, before you break anything.</b> In the terminal, inside the project: <code>git status</code>. If <code>lab.html</code> and <code>lab.js</code> aren't committed yet, commit them now, while they still work.<br><br>
+      After that, <b>never commit the broken state</b>. The commit is your clean baseline, the uncommitted change is the planted bug. That split is what makes <code>git diff</code> show exactly what you broke and <code>git checkout lab/lab.html</code> undo it in one command.<br><br>
+      If you accidentally stage the bug: <code>git restore --staged lab/lab.html</code>.
+    </div>
+  </div>
+
+  <div class="box" style="box-shadow:5px 5px 0 var(--ent)">
+    <h2>Dana — session replay stopped</h2>
+    <p class="hint">In <code>lab.html</code>, inside <code>posthog.init</code>, add the last line. Save, reload the shop, and the investigation starts.</p>
+    <div class="code">// your existing init in lab.html, untouched.
+// keep your own project key, only add the last line.
+
+posthog.init('phc_...', {
+    api_host: 'https://eu.i.posthog.com',
+    defaults: '2026-05-30',
+    disable_session_recording: true   // &lt;- add this
+})</div>
+
+    <h3>What this code does</h3>
+    <p class="small"><code>disable_session_recording</code> is a posthog-js config option. The session recorder is a separate chunk of JavaScript that the SDK fetches after it loads, and that watches the DOM so the screen can be reconstructed later. With this option set to <code>true</code>, that chunk is never fetched and never started. The rest of the SDK carries on intact: pageviews, autocapture, your own events, all still firing.</p>
+
+    <h3>Why it reproduces the ticket</h3>
+    <p class="small">Dana's symptom is "no new recordings, but the rest of PostHog works". That split, one product dead and all the others alive, is the signature of a disabled setting rather than an outage. And it is the most common real cause: someone turned it off once, for cost or for privacy, and nobody remembers. Their troubleshooting docs list this exact option.</p>
+
+    <h3>The evidence you're hunting</h3>
+    <p class="small">Network tab, Fetch/XHR filter, click around the shop. Before, you saw several <code>/s/</code> calls. Now there are none, only <code>/e/</code>. Worth running it in both states, with and without the line, so you remember what each one looks like.</p>
+
+    <div class="tip">
+      <b>This pair is worth memorising.</b><br>
+      No <code>/s/</code> going out = the SDK isn't even trying to record. Config problem, customer side.<br>
+      <code>/s/</code> going out with a 200 and still no recordings in the list = ingestion problem, PostHog side.<br>
+      Two completely different causes, and the Network tab separates them in ten seconds.
+    </div>
+  </div>
+
+  <div class="box" style="box-shadow:5px 5px 0 var(--warn)">
+    <h2>Priya — WAU dropped 30%</h2>
+    <p class="hint">In <code>lab.js</code>, rename an event. Save, use the shop a few times, then look in the PostHog dashboard.</p>
+    <div class="code">// from
+posthog.capture('product_added_to_cart', {
+
+// to
+posthog.capture('cart_item_added', {</div>
+
+    <h3>What this code does</h3>
+    <p class="small">The first argument to <code>posthog.capture()</code> is the event name, and that name is its identity. PostHog does not track "that line of code", it tracks the string. So changing the string renames nothing: as far as PostHog is concerned, one event stopped existing and a different one, with no history at all, started existing.</p>
+
+    <h3>Why it reproduces the ticket</h3>
+    <p class="small">Every saved insight, funnel and dashboard points at the old name. The second the deploy lands, all of them are counting an event that no longer arrives, and the chart falls off a cliff. The app is perfect, no user complains, nothing shows up in an error log, which is exactly why the customer writes "we didn't change anything" in good faith. In a real app the drop is partial rather than total, like Priya's 30%, because the same event fires from several places and the deploy only renamed one of them.</p>
+
+    <h3>The evidence you're hunting</h3>
+    <p class="small">Run <code>posthog.debug()</code> and use the shop. Events keep firing, under a new name. In the dashboard, <code>cart_item_added</code> is born on the deploy date and the old one stops on the same day. You will not see a real 30% drop in a chart, that would need weeks of data. What you can reproduce is the cause and the evidence.</p>
+
+    <div class="tip">
+      <b>Cause number one of a mysterious metric drop.</b> The signature never changes: one event dies and another is born on the same date. If you see that, you found it.
+    </div>
+  </div>
+
+  <div class="box">
+    <h2>Undoing</h2>
+    <p class="hint">Comment out instead of deleting, so you can flip a bug on and off without retyping:</p>
+    <div class="code">// disable_session_recording: true</div>
+  </div>
+
+</div>
+
+<!-- ============ STEPS ============ -->
+<div class="view on" id="vSteps">
+
+  <div class="tickets">
+    <div class="tk dana">
+      <h3>#4498 — Dana K.</h3>
+      <div class="meta">Northwind Research · opened today 09:05</div>
+      <span class="chip plan">Enterprise</span>
+      <span class="chip tag">churn_risk</span>
+      <button class="btn-sm" data-read="fullDana">Read the full ticket</button>
+      <div class="full hidden" id="fullDana">Since Monday morning we are not getting any new session recordings. The list is empty for this week. Nothing changed on our side as far as we know.
+
+We are in the middle of a usability study and every day without recordings is data we cannot get back. We have already lost three days.
+
+This is the main reason we pay for PostHog. Please treat as urgent.</div>
+      <label style="margin-top:12px">Your summary of the problem</label>
+      <textarea id="sumDana" style="min-height:80px" placeholder="In one or two lines, in your own words.">Data is either not being collected (in this case, lost) or is piling up in Kafka or beyond (depending on time limit, could also be lost). They claim nothing has changed on their side, indicating a possible service issue.</textarea>
+      <div class="row"><span class="count" id="cDana2">0 words</span></div>
+    </div>
+    <div class="tk priya">
+      <h3>Slack 🎫 — Priya N.</h3>
+      <div class="meta">Velocity Labs · today 09:20</div>
+      <span class="chip plan">Enterprise</span>
+      <span class="chip tag">top_20</span>
+      <button class="btn-sm" data-read="fullPriya">Read the full ticket</button>
+      <div class="full hidden" id="fullPriya">Morning! Our weekly active users number in the dashboard dropped about 30% between Friday and Monday. We did not ship anything over the weekend.
+
+I have a board meeting at 16:00 today and this chart is in the deck. I need to know by then whether this is real or a PostHog issue, because I have to either explain a drop or remove the slide.
+
+Happy to jump on a call if that is faster.</div>
+      <label style="margin-top:12px">Your summary of the problem</label>
+      <textarea id="sumPriya" style="min-height:80px" placeholder="In one or two lines, in your own words.">User records for the weekend are settled, we either have them or not. If it&#x27;s confirmed that they haven&#x27;t changed anything, could also be a wider service issue.</textarea>
+      <div class="row"><span class="count" id="cPriya2">0 words</span></div>
+    </div>
+  </div>
+
+  <div id="steps"></div>
+</div>
+
+<!-- ============ WRITE ============ -->
+<div class="view" id="vWrite">
+
+  <div class="box">
+    <h2>Reply to Dana</h2>
+    <p class="hint">An acknowledgement. She already got an automatic confirmation when the ticket was created, so this has to add something: what you're doing and when you'll be back.</p>
+    <textarea id="replyDana" placeholder="Hey Dana,">Hey Dana,
+We&#x27;re truly sorry you trusted our services on data recording and experienced this possible lost.
+We are currently looking into whether it&#x27;s a Posthog wider issue or if I can find error logs between configuration and our servers.
+I will get back to you at 12:00 with the findings, even if I don&#x27;t have a definitive answer/solution.
+
+In the meantime, let me know if you have any questions!</textarea>
+    <div class="row">
+      <button class="btn-sm" data-model="mDana">Show a model answer</button>
+      <span class="count" id="cDana">0 words</span>
+    </div>
+    <div class="model hidden" id="mDana">Hey Dana,
+
+Thanks for flagging this, and sorry about the days of study data you've lost already. I've picked this up and I'm looking now.
+
+First thing I'm checking is whether this is specific to your project or something wider on our side. I'll come back to you before 12:00 with what I find, even if I don't have a fix by then.<div class="why">Acknowledges the frustration, names a concrete first step, commits to a time. Doesn't ask her for anything you can check yourself.</div></div>
+  </div>
+
+  <div class="box">
+    <h2>Reply to Priya</h2>
+    <p class="hint">She has a deadline. Your reply has to say whether you'll make it, and what she does if you don't.</p>
+    <textarea id="replyPriya" placeholder="Hey Priya,">Hey Priya,
+Thank you for flagging the mismatch on the user records you&#x27;re receiving from us and we&#x27;re sorry for the inconvenience.
+I will start investigating soon and will get back to you at 13:00 with what I have found and what you can explain in the meeting.
+Thanks for your patience and let me know if you have any questions :)</textarea>
+    <div class="row">
+      <button class="btn-sm" data-model="mPriya">Show a model answer</button>
+      <span class="count" id="cPriya">0 words</span>
+    </div>
+    <div class="model hidden" id="mPriya">Hey Priya,
+
+Got it, and thanks for giving me the deadline up front, that helps a lot.
+
+I'm digging into whether the drop is real or something on our side, and I'll have an answer for you by 15:00 so you have time either way. If I find it's a tracking change rather than a real drop, I'll tell you exactly what changed so you can say it in the room.
+
+No need for a call yet. If I hit something that's faster to explain live, I'll ping you.<div class="why">Confirms the deadline, promises ahead of it rather than on it, treats her meeting as the real goal, and answers the call offer without spending her time.</div></div>
+  </div>
+
+  <div class="box">
+    <h2>How PostHog actually writes</h2>
+    <p class="hint">Their real text during a session replay ingestion failure, published on the status page.</p>
+    <div class="model">We've spotted that session recordings are not visible in eu.posthog.com. No recording data has been lost!
+
+We believe we've identified the root cause and are working to resolve it. Thanks for your patience<div class="why">Four lines, three moves: what broke, the scariest question answered up front, and what happens next. No jargon, no promise of a deadline they can't keep.</div></div>
+    <p style="font-size:13.5px;margin-top:14px">Tone rules from the handbook: open with "Hey [name]". Acknowledge frustration and thank them for the report. Make clear who is waiting on whom, and for how long. Don't make the customer do work you can do yourself, and explain why you need anything you ask for.</p>
+  </div>
+</div>
+
+<!-- ============ INVESTIGATE ============ -->
+<div class="view" id="vDig">
+
+  <div class="timer">
+    <div class="big" id="clock">00:00:00</div>
+    <div class="row">
+      <button style="background:var(--btnGo)" id="tStart">Start</button>
+      <button style="background:var(--btnStop)" id="tPause">Pause</button>
+      <button style="background:var(--btnReset)" id="tReset">Reset</button>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <label style="margin:0">Working on</label>
+      <select id="working">
+        <option value="dana">Dana — #4498</option>
+        <option value="priya">Priya — Slack</option>
+      </select>
+    </div>
+    <div class="vs" id="vs">fill in your estimate in step 3</div>
+  </div>
+
+  <div class="box" style="box-shadow:5px 5px 0 var(--ent)">
+    <h2>Reproduce and rule out — Dana #4498</h2>
+    <p class="hint">Cheapest to most expensive. Each one answers a different question. Click to tick.</p>
+    <div id="checksDana"></div>
+    <div class="tip" id="tipDana"></div>
+  </div>
+
+  <div class="box" style="box-shadow:5px 5px 0 var(--warn)">
+    <h2>Reproduce and rule out — Priya, Slack</h2>
+    <p class="hint">Cheapest to most expensive. Each one answers a different question. Click to tick.</p>
+    <div id="checksPriya"></div>
+    <div class="tip" id="tipPriya"></div>
+  </div>
+
+  <div class="box">
+    <h2>What I found</h2>
+    <p class="hint">Write as you go. This becomes the customer reply and the handover note, so write it for whoever reads it next.</p>
+    <textarea id="findings" placeholder="Hypothesis:&#10;What I tested:&#10;What that rules out:&#10;Next step:">Dana:
+Hypothesis:
+No /s/ on Network tab
+Session recording disabled: true, found on her configuration
+What I tested: Checked status.posthog, tested removing session recording disabled: true
+What that rules out: that it&#x27;s a wider issue
+Next step: reply to her on how to fix it
+
+Priya:
+When I add products to the cart, it fires &quot;[PostHog.js] send &quot;cart_item_added&quot; {uuid: &#x27;01a20817-5f93-79bf-8029-5b95f469b320&#x27;, event: &#x27;cart_item_added&#x27;, properties: {...}, timestamp: Mon Nov 23 2026 12:07:59 GMT+0100 (Central European Standard Time)}&quot;.
+What I tested: When I go on Data Management/Event Definitions on Posthog Cloud, I see there used to be a &quot;Product Added to Cart&quot; with the same properties.
+What that rules out: that it&#x27;s a wider issue, that her user data was not being recorded.
+Next step: ask her if by any chance someone renamed the event.</textarea>
+    <div class="row"><span class="count" id="cFind">0 words</span></div>
+  </div>
+</div>
+
+<!-- ============ HAND OVER ============ -->
+<div class="view" id="vHand">
+  <div class="box">
+    <h2>Final reply to Dana</h2>
+    <p class="hint">The answer she actually gets once you know the cause. Four things belong in it: what was wrong, in her words not yours; whether her lost recordings come back or not; what she has to do, if anything; and what you did on your side.</p>
+    <textarea id="finalDana" placeholder="Hey Dana,">Hey Dana,
+
+Unfortunately, I have to confirm what you suspected: those three days of recordings are gone. As they were never captured, there&#x27;s no data on our side waiting to appear.
+
+Here&#x27;s what I found:
+Our public service status page shows &quot;All systems operational&quot; for the EU Cloud, so we can rule that out.
+Looking at the public page of your project, the Network tab on DevTools has no /s/ calls which means the recorder never starts.
+Then on your snippet, I found &quot;disable_session_recording&quot; set to true. You can read more here on what that means: https://posthog.com/docs/references/posthog-js/types/PostHogConfig.
+
+Can you check with your team who/when/why could have implemented this configuration? This way you can have the correct context in case something else changed as well. Once &quot;disable_session_recording&quot; is set to &quot;false&quot;, you&#x27;ll start receiving new recordings.
+Let me know if you need help to remove the disabling of session recording from your snippet!
+
+[Add tag #TAM to notify team technical account management as there&#x27;s churn risk]</textarea>
+    <div class="row"><span class="count" id="cFinalDana">0 words</span></div>
+  </div>
+
+  <div class="box">
+    <h2>Final reply to Priya</h2>
+    <p class="hint">Same four things. Plus the one she asked for: is the drop real or not, said plainly enough that she can repeat it in a board meeting without you.</p>
+    <textarea id="finalPriya" placeholder="Hey Priya,">Hey Priya,
+Thanks for waiting!
+
+Short answer for your meeting: the drop is not real, your users did not stop adding to the cart and no data was lost.
+
+On Mon, Nov 23, 2026 11:05 AM, &quot;product_added_to_cart&quot; stopped arriving and a new event, &quot;cart_item_added&quot; started. This new event has the same volume, properties and pages as the one that stopped.
+As your saved chart counts the old name, it shows a 30% drop while the activity never changed.
+
+Could you maybe check with the team if &quot;product_added_to_cart&quot; was renamed to &quot;cart_item_added&quot;? If this is true, no data was lost. For the slide, you can combine both event names over the period, removing the drop. Happy to send you that chart before 16:00.
+
+Looking forward to hearing from you and let me know if there are any questions :)</textarea>
+    <div class="row"><span class="count" id="cFinalPriya">0 words</span></div>
+  </div>
+
+  <div class="box">
+    <h2>Private handover note</h2>
+    <p class="hint">Different from escalating. This is for unfinished work going to the next Support Hero at the end of your shift, not to another team. The rule is the same: say why you're handing it over and what you expect to happen next.</p>
+    <textarea id="handoff" class="short" placeholder="Handing over to the next Support Hero.">Handing over to the next Support Hero.
+
+Priya N., Velocity Labs. Enterprise, top_20. Weekly active users dropped 30% between Friday and Monday.
+
+Root cause almost certainly found: product_added_to_cart stopped arriving on 23/11 and cart_item_added started the same day, at the same volume, with the same properties, on the same pages. Their saved insight counts the old name. No data was lost and the drop is just the drop of the previous event name.
+
+Waiting on: confirmation from their team that this was a rename. I asked who deployed on 23/11.
+
+Promised: an answer before their 16:00 board meeting, delivered, waiting on their reply.
+
+Left as Pending, waiting on the customer.</textarea>
+    <div class="row">
+      <button class="btn-sm" data-model="mHand">Show a model note</button>
+      <button class="btn-sm" data-model="mStatus">Ticket statuses</button>
+      <span class="count" id="cHand">0 words</span>
+    </div>
+    <div class="model hidden" id="mHand">Handing over to the next Support Hero.
+
+Already ruled out: not a platform incident (status page clean, no other reports), and recording is enabled in their project settings.
+
+Next step: check $recording_status on their recent events, to see whether the SDK is even trying to record.
+
+Customer: spoke to Dana at 11:30 and promised a reply today. Enterprise + churn_risk, so she needs an answer before end of day.
+
+Left as Open, assigned to the team rather than to me.</div>
+    <div class="model hidden" id="mStatus"><b>Pending</b> — you've asked the customer something, or you're not sure it's resolved.
+<b>Open</b> — you're still investigating, or the customer replied.
+<b>On hold</b> — use sparingly, and always with a snooze. Not while you're actively investigating.
+<b>Resolved</b> — the customer confirmed, or you're about 90% confident.
+
+Escalating to engineering means assigning the ticket to that team and updating the team and SME tags. Transferring to another SME group means removing your SME tag and adding theirs. Either way, the private note goes with it.</div>
+  </div>
+
+  <div class="row">
+    <button id="copyAll" style="background:var(--btnCopy)">Copy everything to paste in chat</button>
+    <button id="resetAll">Reset everything</button>
+  </div>
+  <p class="small" style="margin-top:10px;opacity:.7">Reset clears every tick, estimate, note and the clock. Your theme stays.</p>
+</div>
+
+
+</div>
+
+<script>
+/* ---------- theme ---------- */
+const THEME_KEY = 'runbook-theme';
+function setTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('theme').textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+  try { localStorage.setItem(THEME_KEY, t); } catch(err) {}
+}
+document.getElementById('theme').onclick = () =>
+  setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+(function(){
+  let t = null;
+  try { t = localStorage.getItem(THEME_KEY); } catch(err) {}
+  if (!t) t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  setTheme(t);
+})();
+
+/* ---------- data ---------- */
+const STEPS = [
+  { t:"Read everything", d:"Both tickets, in full, without replying to anything yet. You're only collecting." },
+  { t:"Rank them", d:"Plan, tags, time waiting, damage. Work out what outranks what, and commit to an order.", calc:"rank" },
+  { t:"Estimate each one", d:"How long to resolve? Rough guess. Then double it, because investigations always overrun.", calc:"est" },
+  { t:"Work out the start time for anything with a deadline", d:"Deadline minus doubled estimate. The result is when to start, not where it sits in the queue.", calc:"start" },
+  { t:"Sweep with acknowledgements", d:"A short reply on every paid ticket you are not starting right now. Stops the SLA clock. Write them in tab 2." },
+  { t:"Work the first one", d:"Until the next start time arrives. Without looking at the rest of the queue." },
+  { t:"At the calculated time, stop and switch", d:"Even mid-task. That is exactly what you did the arithmetic for." },
+  { t:"Hand over whatever is unfinished", d:"With a private note: what you ruled out, the next step, what you promised the customer." }
+];
+
+const PLAYBOOK = {
+  dana: {
+    checks: [
+      { t:"status.posthog.com", d:"Any open incident right now? Answers 'is it everyone' in thirty seconds, and it's free." },
+      { t:"Project replay settings", d:"Is recording enabled? Any authorized domain or URL trigger cutting their site out?" },
+      { t:"Browser console on the customer's site", d:"Did the recorder script load? Ad blockers kill it, and that shows up as $sdk_debug_recording_script_not_loaded." },
+      { t:"Network tab, look for /s/ calls", d:"No /s/ going out means the problem is in the SDK: trigger, config or script. /s/ returning 200 with no recordings in the list means the problem is in ingestion, on PostHog's side." },
+      { t:"Properties on recent events", d:"$recording_status gives the SDK state: active, buffering, disabled, sampled, paused. $has_recording says whether a recording was stored." },
+      { t:"Their posthog-js config", d:"Is disable_session_recording set? Old SDK version? Most common cause and the hardest one to spot." }
+    ],
+    tip: '<b>Always start with the status page.</b> PostHog has a real logged incident titled "Some session replays are not being captured", caused by a change to the remote config endpoint, affecting US and EU Cloud. Thirty seconds of checking answers "is it just her or is it everyone", which is the question that decides everything else.'
+  },
+  priya: {
+    checks: [
+      { t:"status.posthog.com, around the drop", d:"Any ingestion incident between Friday and Monday? Events lost at the source drag down every metric downstream." },
+      { t:"Raw event counts over the same period", d:"Did events drop, or did people drop? If event volume is flat and only the person count fell, it's an identity problem, not a capture problem." },
+      { t:"Event list, sorted by last seen", d:"Did any event stop arriving on the date of the drop? That's the strongest signal there is." },
+      { t:"Was a new event born on the same date?", d:"A new name appearing while an old one dies is a deploy rename. Cause number one." },
+      { t:"Was there a deploy between Friday and Monday?", d:"Ask directly, and check $lib_version on the events. 'We didn't change anything' usually means 'I didn't change anything'." },
+      { t:"Did the insight definition change?", d:"Filter, date range, property, someone editing the saved chart. Check the insight's history before blaming the data." },
+      { t:"Compare with the same week last month", d:"Before calling it a drop, rule out seasonality. Holidays and month-end move numbers on their own." }
+    ],
+    tip: '<b>"We didn\'t change anything" is the most common and least reliable sentence in a ticket.</b> It isn\'t a lie, it\'s scope: the person writing didn\'t change anything. Someone else on the team might have. Treat it as a hypothesis to test, never as established fact.'
+  }
+};
+
+/* ---------- build ---------- */
+const host = document.getElementById('steps');
+const done = {}, checks = { dana:{}, priya:{} };
+
+STEPS.forEach((s, i) => {
+  const el = document.createElement('div');
+  el.className = 'step'; el.dataset.i = i;
+  let extra = '';
+  if (s.calc === 'rank') extra = `<div class="calc">
+      <label>Your order, and why each one sits where it does</label>
+      <textarea id="ranking" class="short" placeholder="1. &#10;   why:&#10;&#10;2. &#10;   why:">1. Dana
+Gotta check also if it&#x27;s not a service issue that could be affecting multiple users.
+Priority as both accounts are enterprise and this one could be actually losing data.
+In this case, churnrisk and top_20 will not decide who to prioritize, but how to handle the ticket. (Churn risk needs to be informed to tech account manager/customer success)
+
+2. Priya
+The weekend data is settled and her board meeting is at 16:00 so we have time to figure out this data specifically. Could also be losing user records by the hour, could also be a posthog higher blast radius issue.
+As she&#x27;s giving us the option to either explain this or remove the slide, will prioritize Dana first.</textarea>
+      <div class="row"><span class="count" id="cRank">0 words</span></div>
+      <p class="small" style="margin-top:8px;opacity:.75">The wrong order with clear reasoning beats the right order by luck. Write the why.</p></div>`;
+  if (s.calc === 'est') extra = `<div class="calc">
+      <label>Dana — your estimate, in minutes</label>
+      <input type="number" id="estDana" placeholder="90" min="5" step="5">
+      <label>Priya — your estimate, in minutes</label>
+      <input type="number" id="estPriya" placeholder="90" min="5" step="5">
+      <div class="result" id="estOut">fill in both</div></div>`;
+  if (s.calc === 'start') extra = `<div class="calc">
+      <label>Priya's deadline</label>
+      <input type="time" id="deadline" value="16:00" style="width:130px">
+      <label>The start time you worked out</label>
+      <input type="time" id="startGuess" style="width:130px">
+      <div class="row"><button class="btn-sm" id="checkStart">Check my arithmetic</button></div>
+      <div class="result" id="startOut">work it out yourself first, then check</div></div>`;
+  el.innerHTML = `<div class="num">${i+1}</div><div class="step-body">
+      <h4>${s.t}</h4><p>${s.d}</p>${extra}
+      <div class="step-act"><button class="btn-check" data-check="${i}">Mark done</button></div></div>`;
+  host.appendChild(el);
+});
+
+const who = () => document.getElementById('working').value;
+
+function renderChecks(){
+  ['dana','priya'].forEach(k => {
+    const p = PLAYBOOK[k];
+    const box = document.getElementById(k === 'dana' ? 'checksDana' : 'checksPriya');
+    box.innerHTML = '';
+    p.checks.forEach((c, i) => {
+      const on = !!checks[k][i];
+      const el = document.createElement('div');
+      el.className = 'chk' + (on ? ' done' : '');
+      el.dataset.c = i; el.dataset.k = k;
+      el.innerHTML = `<div class="mark">${on ? '\u2713' : ''}</div><div><strong>${c.t}</strong><span>${c.d}</span></div>`;
+      box.appendChild(el);
+    });
+    document.getElementById(k === 'dana' ? 'tipDana' : 'tipPriya').innerHTML = p.tip;
+  });
+}
+
+/* ---------- arithmetic ---------- */
+const toHM = m => { const h = Math.floor(m/60), x = m%60;
+  return h && x ? `${h}h${String(x).padStart(2,'0')}` : h ? `${h}h` : `${x}min`; };
+
+function recalc(){
+  const a = parseInt(document.getElementById('estDana').value, 10);
+  const b = parseInt(document.getElementById('estPriya').value, 10);
+  document.getElementById('estOut').textContent =
+    (!isNaN(a) && !isNaN(b))
+      ? `Dana:  ${toHM(a)} → doubled ${toHM(a*2)}\nPriya: ${toHM(b)} → doubled ${toHM(b*2)}`
+      : 'fill in both';
+
+  const sOut = document.getElementById('startOut');
+  sOut.textContent = 'work it out yourself first, then check';
+
+  drawVs();
+}
+
+function drawVs(){
+  const k = who();
+  const raw = parseInt(document.getElementById(k === 'dana' ? 'estDana' : 'estPriya').value, 10);
+  const vs = document.getElementById('vs');
+  if (isNaN(raw)) { vs.textContent = 'fill in your estimate in step 3'; return; }
+  const budget = raw*2*60, pctv = Math.round(secs/budget*100);
+  vs.textContent = `doubled estimate: ${toHM(raw*2)}\nelapsed: ${toHM(Math.floor(secs/60))}\n` +
+    (secs > budget ? `over by ${toHM(Math.floor((secs-budget)/60))}. Worth stopping to reassess.`
+                   : `${pctv}% of the budget used.`);
+}
+
+function checkStart(){
+  const sOut = document.getElementById('startOut');
+  const est = parseInt(document.getElementById('estPriya').value, 10);
+  const dl = document.getElementById('deadline').value;
+  const mine = document.getElementById('startGuess').value;
+
+  if (isNaN(est)) { sOut.textContent = 'fill in your estimate for Priya in step 3 first'; return; }
+  if (!dl || !mine) { sOut.textContent = 'fill in the deadline and your own start time first'; return; }
+
+  const [dh, dm] = dl.split(':').map(Number);
+  const [mh, mm] = mine.split(':').map(Number);
+  const work = est*2;
+  const right = dh*60 + dm - work;
+  const yours = mh*60 + mm;
+  const hh = String(Math.floor((((right%1440)+1440)%1440)/60)).padStart(2,'0');
+  const nn = String(((right%60)+60)%60).padStart(2,'0');
+  const off = Math.abs(yours - right);
+  const gap = right - (9*60+20);
+
+  sOut.textContent = (off === 0
+      ? `\u2713 matches.\n\n${dl} - ${toHM(work)} = ${hh}:${nn}`
+      : `your answer: ${mine}\n${dl} - ${toHM(work)} = ${hh}:${nn}\noff by ${toHM(off)}`)
+    + (gap > 0 ? `\n\nFrom 09:20 that is ${toHM(gap)} of clear time.` : `\n\nThat is already behind 09:20.`);
+}
+
+/* ---------- timer ---------- */
+let secs = 0, timer = null;
+const clock = document.getElementById('clock');
+function draw(){
+  clock.textContent = [3600, 60, 1].map((d, i) =>
+    String(i === 0 ? Math.floor(secs/3600) : i === 1 ? Math.floor(secs%3600/60) : secs%60).padStart(2,'0')).join(':');
+  drawVs();
+}
+document.getElementById('tStart').onclick = () => {
+  if (timer) return;
+  timer = setInterval(() => { secs++; draw(); if (secs % 10 === 0) save(); }, 1000);
+};
+document.getElementById('tPause').onclick = () => { clearInterval(timer); timer = null; save(); };
+document.getElementById('tReset').onclick = () => { clearInterval(timer); timer = null; secs = 0; draw(); save(); };
+document.getElementById('working').onchange = () => { drawVs(); save(); };
+document.getElementById('checkStart').onclick = () => { checkStart(); save(); };
+
+/* ---------- interactions ---------- */
+document.addEventListener('click', e => {
+  const nav = e.target.closest('[data-view]');
+  if (nav) {
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('on'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
+    nav.classList.add('on');
+    document.getElementById(nav.dataset.view).classList.add('on');
+    window.scrollTo(0, 0);
+    return;
+  }
+  const rd = e.target.closest('[data-read]');
+  if (rd) {
+    const box = document.getElementById(rd.dataset.read);
+    const was = box.classList.contains('hidden');
+    box.classList.toggle('hidden');
+    rd.textContent = was ? 'Hide the ticket' : 'Read the full ticket';
+    return;
+  }
+  const md = e.target.closest('[data-model]');
+  if (md) { document.getElementById(md.dataset.model).classList.toggle('hidden'); return; }
+  const ck = e.target.closest('[data-check]');
+  if (ck) { done[ck.dataset.check] = !done[ck.dataset.check]; render(); save(); return; }
+  const cc = e.target.closest('.chk');
+  if (cc) { const k = cc.dataset.k; checks[k][cc.dataset.c] = !checks[k][cc.dataset.c]; renderChecks(); save(); }
+});
+
+const AREAS = [['sumDana','cDana2'],['sumPriya','cPriya2'],['ranking','cRank'],['replyDana','cDana'],['replyPriya','cPriya'],['findings','cFind'],['finalDana','cFinalDana'],['finalPriya','cFinalPriya'],['handoff','cHand']];
+document.addEventListener('input', e => {
+  if (['estDana','estPriya','deadline','startGuess'].includes(e.target.id)) recalc();
+  if (AREAS.some(([a]) => a === e.target.id)) counts();
+  save();
+});
+
+function counts(){
+  AREAS.forEach(([a, c]) => {
+    const v = document.getElementById(a).value.trim();
+    const n = v ? v.split(/\s+/).length : 0;
+    document.getElementById(c).textContent = n + (n === 1 ? ' word' : ' words');
+  });
+}
+
+function render(){
+  let n = 0;
+  STEPS.forEach((_, i) => {
+    const el = host.querySelector(`.step[data-i="${i}"]`);
+    const btn = el.querySelector('[data-check]');
+    if (done[i]) { el.classList.add('done'); btn.textContent = 'Unmark'; n++; }
+    else { el.classList.remove('done'); btn.textContent = 'Mark done'; }
+  });
+  document.getElementById('bar').style.width = (n/STEPS.length*100) + '%';
+  document.getElementById('pct').textContent = `${n} of ${STEPS.length} steps`;
+}
+
+document.getElementById('copyAll').onclick = () => {
+  const g = id => document.getElementById(id).value.trim() || '(empty)';
+  const txt = `PROBLEM SUMMARIES\n\nDana #4498\n${g('sumDana')}\n\nPriya, Slack\n${g('sumPriya')}\n\n---\n\nMY RANKING\n\n${g('ranking')}\n\n---\n\nREPLY TO DANA\n\n${g('replyDana')}\n\n---\n\nREPLY TO PRIYA\n\n${g('replyPriya')}\n\n---\n\nWHAT I FOUND\n\n${g('findings')}\n\n---\n\nFINAL REPLY TO DANA\n\n${g('finalDana')}\n\n---\n\nFINAL REPLY TO PRIYA\n\n${g('finalPriya')}\n\n---\n\nHANDOVER NOTE\n\n${g('handoff')}\n\n---\n\ntime on the clock: ${clock.textContent}`;
+  try { navigator.clipboard.writeText(txt); } catch(err) {}
+  const b = document.getElementById('copyAll');
+  b.textContent = 'Copied';
+  setTimeout(() => { b.textContent = 'Copy everything to paste in chat'; }, 1800);
+};
+
+let resetArmed = false;
+const rb = document.getElementById('resetAll');
+rb.onclick = () => {
+  if (!resetArmed) {
+    resetArmed = true;
+    rb.textContent = 'Click again to wipe everything';
+    rb.style.background = 'var(--ent)';
+    rb.style.color = '#fff';
+    setTimeout(() => {
+      if (!resetArmed) return;
+      resetArmed = false;
+      rb.textContent = 'Reset everything';
+      rb.style.background = '';
+      rb.style.color = '';
+    }, 4000);
+    return;
+  }
+  try { localStorage.removeItem(KEY); } catch(err) {}
+  location.reload();
+};
+
+const EDITS_KEY = 'runbook-readme-v1';
+const ORIGINAL = {};
+
+function saveReadme(){
+  try{
+    const o = {};
+    document.querySelectorAll('[data-edit]').forEach(el => o[el.dataset.edit] = el.innerHTML);
+    localStorage.setItem(EDITS_KEY, JSON.stringify(o));
+  }catch(err){}
+}
+
+function initReadme(){
+  document.querySelectorAll('[data-edit]').forEach(el => {
+    ORIGINAL[el.dataset.edit] = el.innerHTML;
+    el.setAttribute('contenteditable', 'true');
+    el.setAttribute('spellcheck', 'true');
+  });
+  try{
+    const raw = localStorage.getItem(EDITS_KEY);
+    if (!raw) return;
+    const o = JSON.parse(raw);
+    document.querySelectorAll('[data-edit]').forEach(el => {
+      if (o[el.dataset.edit]) el.innerHTML = o[el.dataset.edit];
+    });
+  }catch(err){}
+}
+
+document.addEventListener('input', e => { if (e.target.closest('[data-edit]')) saveReadme(); });
+
+document.getElementById('resetReadme').onclick = () => {
+  document.querySelectorAll('[data-edit]').forEach(el => el.innerHTML = ORIGINAL[el.dataset.edit]);
+  saveReadme();
+};
+
+/* ---------- persistence ---------- */
+const KEY = 'runbook-sh-v2';
+function save(){
+  try{
+    const t = {}; AREAS.forEach(([a]) => t[a] = document.getElementById(a).value);
+    localStorage.setItem(KEY, JSON.stringify({ done, checks, secs, text: t,
+      estDana: document.getElementById('estDana').value,
+      estPriya: document.getElementById('estPriya').value,
+      deadline: document.getElementById('deadline').value,
+      startGuess: document.getElementById('startGuess').value,
+      working: document.getElementById('working').value }));
+  }catch(err){}
+}
+function restore(){
+  try{
+    const raw = localStorage.getItem(KEY); if (!raw) return;
+    const d = JSON.parse(raw);
+    if (d.done) Object.assign(done, d.done);
+    if (d.checks && (d.checks.dana || d.checks.priya)) {
+      Object.assign(checks.dana, d.checks.dana || {});
+      Object.assign(checks.priya, d.checks.priya || {});
+    }
+    if (typeof d.secs === 'number') secs = d.secs;
+    if (d.text) AREAS.forEach(([a]) => { if (d.text[a]) document.getElementById(a).value = d.text[a]; });
+    if (d.estDana) document.getElementById('estDana').value = d.estDana;
+    if (d.estPriya) document.getElementById('estPriya').value = d.estPriya;
+    if (d.deadline) document.getElementById('deadline').value = d.deadline;
+    if (d.startGuess) document.getElementById('startGuess').value = d.startGuess;
+    if (d.working) document.getElementById('working').value = d.working;
+  }catch(err){}
+}
+
+initReadme();
+restore();
+render();
+renderChecks();
+counts();
+recalc();
+draw();
+</script>
+</body>
+</html>

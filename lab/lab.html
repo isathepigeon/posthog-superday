@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics Lab</title>
+
+  <script>
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],Object.defineProperty(u,"toString",{configurable:!0,enumerable:!0,writable:!0,value:function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e}}),Object.defineProperty(u.people,"toString",{configurable:!0,enumerable:!0,writable:!0,value:function(){return u.toString(1)+".people (stub)"}}),o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagResult isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+    posthog.init('phc_kKB9apwfA8rpXwGgaiTrjMmkRqaEWQQYQGmY5ouZJdeY', {
+        api_host: 'https://eu.i.posthog.com',
+        defaults: '2026-05-30',
+    })
+  </script>
+
+  <style>
+    body {
+      font-family: Verdana, sans-serif;
+      background: #f4e3c1;
+      color: #2b1a0e;
+      max-width: 620px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .card {
+      background: #fff;
+      border: 3px solid #2b1a0e;
+      box-shadow: 6px 6px 0 #2b1a0e;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    h1 { margin-top: 0; }
+    .lab-note {
+      background: #ffe08a;
+      border: 2px dashed #2b1a0e;
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+    button {
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: bold;
+      padding: 12px 18px;
+      margin: 6px 6px 6px 0;
+      border: 3px solid #2b1a0e;
+      box-shadow: 3px 3px 0 #2b1a0e;
+      cursor: pointer;
+    }
+    button:active { transform: translate(3px, 3px); box-shadow: none; }
+    #login    { background: #8ecae6; }
+    #add      { background: #b7e4c7; }
+    #checkout { background: #ffb4a2; }
+    #logout   { background: #e0e0e0; }
+    #status {
+      margin-top: 18px;
+      padding: 12px;
+      background: #2b1a0e;
+      color: #ffe08a;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="lab-note">
+    Página de treino. Não faz parte do site, serve só para gerar eventos no PostHog.
+  </div>
+
+  <div class="card">
+    <h1>Chocolate Shop</h1>
+
+    <button id="login">Log in</button>
+    <button id="add">Add to cart</button>
+    <button id="checkout">Checkout</button>
+    <button id="logout">Log out</button>
+
+    <div id="status">Not logged in</div>
+  </div>
+
+  <script type="module" src="/lab.js"></script>
+</body>
+</html>
