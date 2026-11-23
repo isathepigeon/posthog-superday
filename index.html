@@ -169,7 +169,8 @@
 
   <div class="box" data-edit="r0">
     <h2 style="font-size:1.5rem">PostHog SuperDay prep</h2>
-    <p class="small" style="margin-top:10px"><a href="https://github.com/isathepigeon/posthog-superday" style="color:var(--accent)"><b>Source on GitHub &rarr;</b></a></p>
+    <p class="small" style="margin-top:10px"><a href="triage.html" style="color:var(--accent)"><b>The triage exercise &rarr;</b></a><br>
+    <a href="https://github.com/isathepigeon/posthog-superday" style="color:var(--accent)"><b>Source on GitHub &rarr;</b></a></p>
   </div>
 
   <div class="box" data-edit="r1" style="box-shadow:5px 5px 0 var(--accent)">
@@ -188,26 +189,17 @@
   </div>
 
   <div class="box" data-edit="r3">
-    <h2>2. I built a small site and broke it on purpose</h2>
-    <p class="small">I have a personal website I had already installed Posthog on since my first interview. For the SuperDay, I came up with two tickets:</p>
+    <h2>2. I built 2 artifacts: a ticket queue, and then an exercise of picking one up</h2>
+    <p class="small">I started by training my ability to prioritize between several tickets with different labels. I asked Claude to generate those tickets for this exercise, following your public handbooks, deliberately more work than fits.</p>
+    <p class="small" style="margin-top:12px"><a href="triage.html" style="color:var(--accent)"><b>Open the ticket queue &rarr;</b></a></p>
+    <p class="small" style="margin-top:14px">Next, I came up with 2 bugs on my project. I have a personal website I had already installed Posthog on since my first interview.</p>
     <p class="small" style="margin-top:10px">1. I added <code>disable_session_recording: true</code> in the init, which stops session replay while leaving everything else working.</p>
     <p class="small" style="margin-top:10px">2. I renamed an event, which kills a saved chart while the rest of the app stays healthy.</p>
     <p class="small" style="margin-top:10px">Then I investigated them as if I had no idea what was wrong. I ran a commit on the clean version so I can use <code>git diff</code> to show what I had broken, and <code>git checkout</code> to undo it.</p>
-  </div>
-
-  <div class="box" data-edit="r4">
-    <h2>3. I ran a day, not a ticket</h2>
-    <p class="small">I have a different artifact where I had multiple tickets to prioritize following your public handbooks, deliberately more work than fits.</p>
-    <p class="small" style="margin-top:4px">These were the two I decided to pick up in one day. An Enterprise customer tagged churn_risk losing session recordings mid usability study, and a top_20 Enterprise customer whose weekly active users dropped 30% with a board meeting at 16:00.</p>
+    <p class="small" style="margin-top:14px">These were the two I decided to pick up in one day. An Enterprise customer tagged churn_risk losing session recordings mid usability study, and a top_20 Enterprise customer whose weekly active users dropped 30% with a board meeting at 16:00.</p>
     <p class="small" style="margin-top:10px">I asked Claude to build this artifact just so I could "Mark Done" on which Step: fully reading and summarizing ticket, first reply to all, time-estimating, investigating, hypothesis, final reply to user and escalation/hand-over message.</p>
   </div>
 
-  <div class="box" data-edit="r5">
-    <h2>What I learned that I did not expect</h2>
-    <p class="small"><b>A deadline is not necessarily a priority.</b> It tells you when to start, not what to do first. You estimate the work, double it, subtract from the deadline. Before that time, the hours belong to whatever is actively losing data.</p>
-    <p class="small" style="margin-top:12px"><b>The SLA clock measures the first reply, not the fix.</b> But from experience, you have to be careful to not only keep the metric by always giving people "empty" acknowledgements while never dirtying your hands to fix their issue.</p>
-    <p class="small" style="margin-top:12px"><b>"We didn't change anything" is scope, not a lie.</b> The person writing didn't change anything. Someone on their team might have.</p>
-  </div>
   <div class="box" data-edit="r6">
     <h2>Stack</h2>
     <p class="small">Vanilla HTML, CSS and JavaScript, no build step. State lives in <code>localStorage</code>.</p>

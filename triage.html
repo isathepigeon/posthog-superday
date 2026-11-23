@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SuperDay Sim — Support Hero</title>
+<style>
+  :root{
+    --ink:#17141f; --paper:#faf7f2; --card:#ffffff;
+    --shadow:#17141f; --tShadow:rgba(23,20,31,.18);
+    --headBg:#17141f; --headFg:#faf7f2;
+    --field:#fcfbf9; --fieldBorder:#ddd8d0; --place:#8b8698;
+    --pill:#eeebe6; --tagBg:#fff6d6; --bodyBorder:#e2ddd4;
+    --btnBg:#ffffff; --btnGo:#b9f6c8; --btnStop:#ffd9a0; --btnReset:#e8e4ef;
+    --ent:#e5484d; --scale:#f2890d; --payg:#3b82c4; --free:#9a95a6;
+    --accent:#6c4df6; --good:#12a150;
+  }
+  html[data-theme="dark"]{
+    --ink:#ece7f5; --paper:#15131c; --card:#201c2b;
+    --shadow:#4a4160; --tShadow:rgba(0,0,0,.45);
+    --headBg:#2a2438; --headFg:#f4f1fb;
+    --field:#2a2438; --fieldBorder:#3d3550; --place:#8e86a3;
+    --pill:#352e46; --tagBg:#3c3420; --bodyBorder:#3d3550;
+    --btnBg:#2a2438; --btnGo:#1e5c3b; --btnStop:#6b4a1c; --btnReset:#3a3450;
+    --ent:#ff6b70; --scale:#ffa63d; --payg:#6aa9e0; --free:#a9a3b6;
+    --accent:#9b84ff; --good:#2ecc71;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font:15px/1.55 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:24px 18px 80px}
+
+  header{
+    background:var(--headBg); color:var(--headFg);
+    border:3px solid var(--ink); box-shadow:7px 7px 0 var(--accent);
+    padding:20px 22px; margin-bottom:22px;
+  }
+  header h1{margin:0; font-size:23px; letter-spacing:-.4px}
+  header p{margin:0; opacity:.82; font-size:13.5px}
+
+  .clockbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .clock{
+    font:700 26px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+    background:var(--paper); color:var(--ink); padding:8px 14px; border:3px solid var(--accent);
+  }
+  button{
+    font:inherit; font-weight:700; cursor:pointer;
+    padding:9px 15px; border:3px solid var(--ink); background:var(--btnBg); color:var(--ink);
+    box-shadow:3px 3px 0 var(--shadow); transition:transform .06s, box-shadow .06s;
+  }
+  button:active{transform:translate(3px,3px); box-shadow:none}
+  .btn-go{background:var(--btnGo)}
+  .btn-stop{background:var(--btnStop)}
+  .btn-reset{background:var(--btnReset)}
+  #theme{margin-left:auto}
+
+  .queue-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 12px;flex-wrap:wrap}
+  .queue-head h2{margin:0;font-size:19px}
+  .queue-head span{font-size:13px;opacity:.75}
+
+  .ticket{
+    background:var(--card); border:3px solid var(--ink); border-left-width:12px;
+    box-shadow:5px 5px 0 var(--tShadow);
+    padding:16px 18px; margin-bottom:16px;
+  }
+  .ticket.ordered{box-shadow:5px 5px 0 var(--good)}
+  .t-top{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+  .badge{
+    font-size:11.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;
+    padding:3px 8px;border:2px solid var(--ink);color:#17141f;
+  }
+  .tag{font-size:11.5px;font-weight:700;padding:3px 8px;border:2px dashed var(--ink);background:var(--tagBg)}
+  .age{font-size:12.5px;opacity:.7;margin-left:auto}
+  .t-sub{font-weight:800;font-size:16px;margin:2px 0 8px}
+  .t-from{font-size:13px;opacity:.75;margin-bottom:10px}
+  .t-body{font-size:14.5px;white-space:pre-line;border-left:3px solid var(--bodyBorder);padding-left:12px}
+  .t-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .order-pill{
+    min-width:42px;height:42px;display:grid;place-items:center;
+    font:800 19px/1 ui-monospace,monospace;
+    border:3px solid var(--ink);background:var(--pill);
+  }
+  .order-pill.set{background:var(--good);color:#0d1b12}
+  textarea{
+    width:100%;margin-top:12px;min-height:60px;padding:10px;
+    font:inherit;font-size:14px;color:var(--ink);
+    border:3px solid var(--fieldBorder);background:var(--field);resize:vertical;
+  }
+  textarea::placeholder{color:var(--place);opacity:1}
+  textarea:focus{outline:none;border-color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>SuperDay Sim — Support Hero</h1>
+    <div class="clockbar">
+      <div class="clock" id="clock">00:00:00</div>
+      <button class="btn-go" id="start">Start the day</button>
+      <button class="btn-stop" id="pause">Pause</button>
+      <button class="btn-reset" id="reset">Reset clock</button>
+      <button id="theme">Night</button>
+    </div>
+  </header>
+
+  <div class="queue-head">
+    <h2>Queue</h2>
+    <span>Click "Priority" to number them. <button class="btn-reset" style="padding:4px 10px;box-shadow:2px 2px 0 var(--shadow)" id="clearOrder">clear order</button></span>
+  </div>
+
+  <div id="tickets"></div>
+
+</div>
+
+<script>
+const TICKETS = [
+  {
+    id:"#4471", plan:"Pay-as-you-go", color:"var(--payg)", tags:[],
+    age:"open 2 days (48h)",
+    from:"Marta R. — Chocolonely Shop",
+    sub:"Unique user numbers are completely wrong",
+    body:`We run a small chocolate shop, around 50 regular customers, and most of them order every week.
+
+PostHog is showing 1,847 unique users for the last 7 days. The event counts look roughly right, it's just the people number that is insane. Our checkout events match our real order count almost exactly.
+
+Also the returning users graph is basically flat at zero, which cannot be right, since most of our customers come back every week.
+
+We added the snippet exactly like the docs said and we haven't touched it since. Is this a bug on your end, or did we break something?`
+  },
+  {
+    id:"#4498", plan:"Enterprise", color:"var(--ent)", tags:["churn_risk"],
+    age:"opened today 09:05",
+    from:"Dana K. — Northwind Research",
+    sub:"Session replay stopped recording for our whole team",
+    body:`Since Monday morning we are not getting any new session recordings. The list is empty for this week. Nothing changed on our side as far as we know.
+
+We are in the middle of a usability study and every day without recordings is data we cannot get back. We have already lost three days.
+
+This is the main reason we pay for PostHog. Please treat as urgent.`
+  },
+  {
+    id:"Slack 🎫", plan:"Enterprise", color:"var(--ent)", tags:["top_20"],
+    age:"today 09:20, #support-velocity",
+    from:"Priya N. — Velocity Labs",
+    sub:"WAU dropped 30% overnight, board deck at 16:00",
+    body:`Morning! Our weekly active users number in the dashboard dropped about 30% between Friday and Monday. We did not ship anything over the weekend.
+
+I have a board meeting at 16:00 today and this chart is in the deck. I need to know by then whether this is real or a PostHog issue, because I have to either explain a drop or remove the slide.
+
+Happy to jump on a call if that is faster.`
+  },
+  {
+    id:"#4502", plan:"Scale", color:"var(--scale)", tags:[],
+    age:"opened yesterday 16:40 (17h)",
+    from:"Sam O. — Tilde",
+    sub:"Please delete 40k test events we sent to production",
+    body:`Last Friday one of our engineers pointed a load test at our production PostHog project by mistake. It sent about 40,000 fake events called "lt_ping" over roughly two hours.
+
+They are polluting our funnels. Can you delete them for us? Also, is there a way to stop this happening again?`
+  },
+  {
+    id:"Community", plan:"Free", color:"var(--free)", tags:[],
+    age:"posted 3 days ago on posthog.com/questions",
+    from:"jonas_dev",
+    sub:"How do I track clicks on outbound links?",
+    body:`I want to know when someone clicks a link on my site that goes to another domain. Autocapture seems to catch some of it but I am not sure how to separate outbound from internal links. Is there a recommended way?`
+  },
+  {
+    id:"PR #31204", plan:"Community PR", color:"var(--free)", tags:[],
+    age:"open 5 days",
+    from:"external contributor — posthog-js repo",
+    sub:"Fix broken code sample in session replay docs",
+    body:`Three-line change. The code sample in the session replay docs calls a method that was renamed two versions ago, so copying it throws an error. PR fixes the sample and adds a missing semicolon.
+
+Tests pass. No reviews yet.`
+  }
+];
+
+const NOTES = {
+  "#4471": "Will be below:\n- Enterprise customers, since it's pay as you go.\n- Other pay-as-you-go customers if they are at churn risk since this one is not.\nWill be above the following:\n- Free users, as those get community support.\n- Other pay-as-you-go customers that are not SLA breached, as this one is waiting for 48h already.\nWill be above all if:\n- I find out the blast radius is immense -> the issue they're describing here affects multiple accounts",
+  "#4498": "Will be above:\n- Community and pay as you go\n- Other enterprise accounts since it's at churn risk\nWill be below:\n- Other enterprise accounts that are also at churn risk, if the others are waiting longer as this one was opened this morning.\nWill be above all if:\n- I find out the blast radius is immense -> as they say they havent changed anything on their side, that might be an indicative of a Posthog service failure that could be impacting multiple users. Once I rule that out, I can proceed with prioritization.",
+  "Slack 🎫": "Will be above\n- Community and pay as you go\n- Other enterprise accounts that are top_20 or churn_risk, since there's a strict, clear deadline (before 16:00)\nWill be below\n- Massive blast radius with any account (there's an issue in a different ticket that will affect multiple users, including this one)",
+  "#4502": "Will be above\n- Community and pay-as-you-go that don't have Scale, as Scale includes support priority\n- Other scale users that are not as SLA breached (this one is waiting for 17h)\n- All of if there's a massive blast radius\nWill be below\n- Enterprise\n- Another Scale user that is at risk of churn\n- Another Scale user that is more SLA breached\n- Any other ticket w an indicative of massive blast radius (hypothesis: this one is 99% surely an issue with their project as their engineer pointed a load test at their prod PostHog project, so its unlikely to affect other users or be a service status issue)",
+  "Community": "Last one as it's a free, community How-to ticket",
+  "PR #31204": "Will be above:\n- \"How to?\" free/community tickets as this one is a PR waiting for review\n- Non SLA breached similar tickets\nWill be below:\n- more SLA breached similar tickets\n- All paid as free can get community support"
+};
+
+const DEFAULT_ORDER = ["Slack 🎫", "#4498", "#4502", "#4471", "PR #31204", "Community"];
+
+const esc = v => v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+const host = document.getElementById('tickets');
+
+TICKETS.forEach((t, i) => {
+  const el = document.createElement('div');
+  el.className = 'ticket';
+  el.style.borderLeftColor = t.color;
+  el.innerHTML = `
+    <div class="t-top">
+      <span class="badge" style="background:${t.color}">${t.plan}</span>
+      ${t.tags.map(g=>`<span class="tag">${g}</span>`).join('')}
+      <span class="age">${t.age}</span>
+    </div>
+    <div class="t-sub">${t.id} — ${t.sub}</div>
+    <div class="t-from">from ${t.from}</div>
+    <div class="t-body">${t.body}</div>
+    <div class="t-foot">
+      <div class="order-pill" data-pill="${i}">–</div>
+      <button data-set="${i}">Priority</button>
+    </div>
+    <textarea data-note="${i}" placeholder="Why this position? What do you do with it today?">${esc(NOTES[t.id] || '')}</textarea>
+  `;
+  host.appendChild(el);
+});
+
+let seq = DEFAULT_ORDER.map(id => String(TICKETS.findIndex(t => t.id === id))).filter(k => k !== '-1');
+
+function renderOrder(){
+  TICKETS.forEach((_, i) => {
+    const key = String(i);
+    const pos = seq.indexOf(key);
+    const pill = host.querySelector(`[data-pill="${i}"]`);
+    const btn  = host.querySelector(`[data-set="${i}"]`);
+    const card = pill.closest('.ticket');
+    if (pos === -1){
+      pill.textContent = '–';
+      pill.classList.remove('set');
+      card.classList.remove('ordered');
+      btn.textContent = 'Priority';
+    } else {
+      pill.textContent = pos + 1;
+      pill.classList.add('set');
+      card.classList.add('ordered');
+      btn.textContent = 'Remove from order';
+    }
+  });
+}
+
+host.addEventListener('click', e => {
+  const b = e.target.closest('button[data-set]');
+  if (!b) return;
+  const key = b.dataset.set;
+  const pos = seq.indexOf(key);
+  if (pos === -1) seq.push(key); else seq.splice(pos, 1);
+  renderOrder();
+  save();
+});
+
+document.getElementById('clearOrder').onclick = () => { seq = []; renderOrder(); save(); };
+
+host.addEventListener('input', e => { if (e.target.dataset.note !== undefined) save(); });
+
+/* ---------- keeps everything in this browser ---------- */
+const KEY = 'superday-sim-v1';
+
+function save(){
+  try{
+    const notes = {};
+    host.querySelectorAll('[data-note]').forEach(t => { notes[t.dataset.note] = t.value; });
+    localStorage.setItem(KEY, JSON.stringify({ seq, notes, secs }));
+  } catch(err) {}
+}
+
+function restore(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (Array.isArray(d.seq)) seq = d.seq;
+    if (d.notes) Object.entries(d.notes).forEach(([k, v]) => {
+      const el = host.querySelector(`[data-note="${k}"]`);
+      if (el && typeof v === 'string') el.value = v;
+    });
+    if (typeof d.secs === 'number') secs = d.secs;
+  } catch(err) {}
+}
+
+/* ---------- clock ---------- */
+let secs = 0, timer = null;
+const clock = document.getElementById('clock');
+const draw = () => {
+  const h = String(Math.floor(secs/3600)).padStart(2,'0');
+  const m = String(Math.floor(secs%3600/60)).padStart(2,'0');
+  const s = String(secs%60).padStart(2,'0');
+  clock.textContent = `${h}:${m}:${s}`;
+};
+document.getElementById('start').onclick = () => {
+  if (timer) return;
+  timer = setInterval(() => { secs++; draw(); if (secs % 10 === 0) save(); }, 1000);
+};
+document.getElementById('pause').onclick = () => { clearInterval(timer); timer = null; save(); };
+document.getElementById('reset').onclick = () => { clearInterval(timer); timer=null; secs=0; draw(); save(); };
+
+/* ---------- night mode ---------- */
+const TKEY = 'superday-sim-theme';
+const tBtn = document.getElementById('theme');
+function setTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  tBtn.textContent = t === 'dark' ? 'Day' : 'Night';
+  try { localStorage.setItem(TKEY, t); } catch(err) {}
+}
+tBtn.onclick = () => setTheme(
+  document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
+);
+let t0 = 'light';
+try {
+  t0 = localStorage.getItem(TKEY)
+    || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+} catch(err) {}
+setTheme(t0);
+
+restore();
+renderOrder();
+draw();
+</script>
+</body>
+</html>
