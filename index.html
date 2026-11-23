@@ -168,44 +168,40 @@
   </div>
 
   <div class="box" data-edit="r1" style="box-shadow:5px 5px 0 var(--accent)">
-    <h2>Hi, I'm Isa. This is everything I did to prepare for the SuperDay.</h2>
-    <p class="small" style="margin-top:10px">None of this was asked for. I wanted to arrive already knowing what a support ticket feels like from the inside, so I built myself a day of them.</p>
+    <h2>Hi, I'm Isa :) This is everything I did to prepare for the SuperDay.</h2>
+    <p class="small" style="margin-top:10px">I heard it's not easy to get an offer and I haven't programmed in JS in a while, so wanted to make sure I came prepared.</p>
   </div>
 
   <div class="box" data-edit="r2">
-    <h2>1. I got PostHog running myself</h2>
-    <p class="small">I forked the repo and cloned it locally. The build died on my laptop, which only has 8GB of RAM, so I moved it onto a Google Cloud VM I already had sitting around from another project. Ubuntu 24.04, 16GB.</p>
-    <p class="small" style="margin-top:10px">From there: <code>flox activate</code>, then <code>hogli start</code>. 31 processes, all the logs in one terminal UI.</p>
+    <h2>1. I got PostHog running locally and didn't use it</h2>
+    <p class="small">Remember when I asked you on slack about my OOM failure? Feels like yesterday!</p>
+    <p class="small" style="margin-top:10px">I forked the repo and cloned it locally. My old Samsung has only 8GB of RAM, so I moved it onto a Google Cloud VM I already had sitting around from another project. It runs Ubuntu and I increased memory to 16GB.</p>
+    <p class="small" style="margin-top:10px">From there: <code>flox activate</code>, then <code>hogli start</code>:</p>
     <img src="vm-local-dev.png" alt="PostHog dev stack running in phrocs on a Google Cloud VM" style="width:100%;margin-top:14px;border:3px solid var(--ink);display:block">
-    <p class="small" style="margin-top:12px">In the end I did the actual exercises against PostHog Cloud, which is what the team suggested in the SuperDay Slack channel. The local stack was not the shortest path to the thing I was trying to learn. But getting it up taught me the architecture, and that turned out to matter more than I expected: when I later had to reason about where a session recording can get lost, I already knew what sits between the browser and the dashboard.</p>
+    <p class="small" style="margin-top:12px">In the end I didn't use this. As you guys suggested it was not needed as the cloud version suffices and this local stack was not the shortest path to what I was trying to exercise.</p>
+    <p class="small" style="margin-top:10px">Getting it to run was great to understand the architecture.</p>
   </div>
 
   <div class="box" data-edit="r3">
     <h2>2. I built a small site and broke it on purpose</h2>
-    <p class="small">I needed a customer, so I played one. I put a fake shop page on my own site's project and planted real bugs in it, one per ticket:</p>
-    <p class="small" style="margin-top:10px"><code>disable_session_recording: true</code> in the init, which stops session replay while leaving everything else working.</p>
-    <p class="small" style="margin-top:6px">A renamed event, which kills a saved chart while the app stays perfectly healthy.</p>
-    <p class="small" style="margin-top:10px">Then I investigated them as if I had no idea what was wrong. Committing the clean version first meant <code>git diff</code> showed exactly what I had broken, and <code>git checkout</code> undid it in one command.</p>
+    <p class="small">I have a personal website I had already installed Posthog on since my first interview. For the SuperDay, I came up with two tickets:</p>
+    <p class="small" style="margin-top:10px">1. I added <code>disable_session_recording: true</code> in the init, which stops session replay while leaving everything else working.</p>
+    <p class="small" style="margin-top:10px">2. I renamed an event, which kills a saved chart while the rest of the app stays healthy.</p>
+    <p class="small" style="margin-top:10px">Then I investigated them as if I had no idea what was wrong. I ran a commit on the clean version so I can use <code>git diff</code> to show what I had broken, and <code>git checkout</code> to undo it.</p>
   </div>
 
   <div class="box" data-edit="r4">
     <h2>3. I ran a day, not a ticket</h2>
-    <p class="small">Two tickets, deliberately more work than fits: an Enterprise customer tagged churn_risk losing session recordings mid usability study, and a top_20 Enterprise customer whose weekly active users dropped 30% with a board meeting at 16:00.</p>
-    <p class="small" style="margin-top:10px">I triaged them against the handbook's actual rules: response targets by plan, the tags that have to be resolved or handed over by end of rotation, paid before community. Then I wrote the acknowledgements, worked the investigation, and wrote the final replies and the handover.</p>
+    <p class="small">I have a different artifact where I had multiple tickets to prioritize following your public handbooks, deliberately more work than fits.</p>
+    <p class="small" style="margin-top:4px">These were the two I decided to pick up in one day. An Enterprise customer tagged churn_risk losing session recordings mid usability study, and a top_20 Enterprise customer whose weekly active users dropped 30% with a board meeting at 16:00.</p>
+    <p class="small" style="margin-top:10px">I asked Claude to build this artifact just so I could "Mark Done" on which Step: fully reading and summarizing ticket, first reply to all, time-estimating, investigating, hypothesis, final reply to user and escalation/hand-over message.</p>
   </div>
 
   <div class="box" data-edit="r5">
-    <h2>What I got out of this</h2>
-    <p class="small"><b>Tags don't always mean priority.</b> Both my tickets were Enterprise, so churn_risk and top_20 couldn't break the tie. What they decide is handling: who else needs looping in.</p>
-    <p class="small" style="margin-top:12px"><b>Most of what I learned came from being wrong first.</b> I had the two tickets filed as "one is losing data, the other just has a deadline" until I noticed that at triage time the data loss is the customer's claim, not a verified fact, and that if the second customer's tracking is still broken she is losing records by the hour too. The two tickets were far closer than my first pass made them look.</p>
-    <p class="small" style="margin-top:12px"><b>Which led to the thing I actually use now:</b> before ranking anything, spend fifteen minutes finding out what you are ranking. A cheap check changes the size of the problem.</p>
-    <p class="small" style="margin-top:12px"><b>I also stopped taking "we didn't change anything" as evidence</b>, including in my own notes. It is scope, not a lie: the person writing didn't change anything.</p>
-  </div>
-
-  <div class="box" data-edit="r6" style="box-shadow:5px 5px 0 var(--warn)">
-    <h2>Where I got to</h2>
-    <p class="small">Honest status: I worked the session replay ticket end to end and found the root cause. The second ticket and the escalation note are unfinished.</p>
-    <p class="small" style="margin-top:10px">Which is itself the point of the exercise. The queue was built to be bigger than the day.</p>
+    <h2>What I learned that I did not expect</h2>
+    <p class="small"><b>A deadline is not necessarily a priority.</b> It tells you when to start, not what to do first. You estimate the work, double it, subtract from the deadline. Before that time, the hours belong to whatever is actively losing data.</p>
+    <p class="small" style="margin-top:12px"><b>The SLA clock measures the first reply, not the fix.</b> But from experience, you have to be careful to not only keep the metric by always giving people "empty" acknowledgements while never dirtying your hands to fix their issue.</p>
+    <p class="small" style="margin-top:12px"><b>"We didn't change anything" is scope, not a lie.</b> The person writing didn't change anything. Someone on their team might have.</p>
   </div>
 </div>
 
@@ -327,7 +323,7 @@ Happy to jump on a call if that is faster.</div>
     <h2>Reply to Dana</h2>
     <p class="hint">An acknowledgement. She already got an automatic confirmation when the ticket was created, so this has to add something: what you're doing and when you'll be back.</p>
     <textarea id="replyDana" placeholder="Hey Dana,">Hey Dana,
-We&#x27;re truly sorry you trusted our services on data recording and experienced this possible lost.
+We&#x27;re truly sorry you trusted our services on data recording and experienced this possible lost. 
 We are currently looking into whether it&#x27;s a Posthog wider issue or if I can find error logs between configuration and our servers.
 I will get back to you at 12:00 with the findings, even if I don&#x27;t have a definitive answer/solution.
 
@@ -417,9 +413,8 @@ Session recording disabled: true, found on her configuration
 What I tested: Checked status.posthog, tested removing session recording disabled: true
 What that rules out: that it&#x27;s a wider issue
 Next step: reply to her on how to fix it
-
 Priya:
-When I add products to the cart, it fires &quot;[PostHog.js] send &quot;cart_item_added&quot; {uuid: &#x27;01a20817-5f93-79bf-8029-5b95f469b320&#x27;, event: &#x27;cart_item_added&#x27;, properties: {...}, timestamp: Mon Nov 23 2026 12:07:59 GMT+0100 (Central European Standard Time)}&quot;.
+When I add products to the cart, it fires &quot;[PostHog.js] send &quot;cart_item_added&quot; {uuid: &#x27;01a20817-5f93-79bf-8029-5b95f469b320&#x27;, event: &#x27;cart_item_added&#x27;, properties: {…}, timestamp: Mon Nov 23 2026 12:07:59 GMT+0100 (Central European Standard Time)}&quot;.
 What I tested: When I go on Data Management/Event Definitions on Posthog Cloud, I see there used to be a &quot;Product Added to Cart&quot; with the same properties.
 What that rules out: that it&#x27;s a wider issue, that her user data was not being recorded.
 Next step: ask her if by any chance someone renamed the event.</textarea>
@@ -470,7 +465,7 @@ Looking forward to hearing from you and let me know if there are any questions :
     <p class="hint">Different from escalating. This is for unfinished work going to the next Support Hero at the end of your shift, not to another team. The rule is the same: say why you're handing it over and what you expect to happen next.</p>
     <textarea id="handoff" class="short" placeholder="Handing over to the next Support Hero.">Handing over to the next Support Hero.
 
-Priya N., Velocity Labs. Enterprise, top_20. Weekly active users dropped 30% between Friday and Monday.
+Priya N., Velocity Labs. Enterprise, top_20.  Weekly active users dropped 30% between Friday and Monday.
 
 Root cause almost certainly found: product_added_to_cart stopped arriving on 23/11 and cart_item_added started the same day, at the same volume, with the same properties, on the same pages. Their saved insight counts the old name. No data was lost and the drop is just the drop of the previous event name.
 
@@ -580,7 +575,6 @@ STEPS.forEach((s, i) => {
 Gotta check also if it&#x27;s not a service issue that could be affecting multiple users.
 Priority as both accounts are enterprise and this one could be actually losing data.
 In this case, churnrisk and top_20 will not decide who to prioritize, but how to handle the ticket. (Churn risk needs to be informed to tech account manager/customer success)
-
 2. Priya
 The weekend data is settled and her board meeting is at 16:00 so we have time to figure out this data specifically. Could also be losing user records by the hour, could also be a posthog higher blast radius issue.
 As she&#x27;s giving us the option to either explain this or remove the slide, will prioritize Dana first.</textarea>
